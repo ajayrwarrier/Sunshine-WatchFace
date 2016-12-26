@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.example.android.sunshine.DetailActivity;
 import com.example.android.sunshine.R;
@@ -188,9 +189,8 @@ public class NotificationUtils {
     }
     public static void notifyWatchFaceAboutWeather(Context context) {
 
-        String location = SunshineDateUtils.getPreferredLocation(context);
-        Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-                location, System.currentTimeMillis());
+        Uri weatherUri = WeatherContract.WeatherEntry
+                .buildWeatherUriWithDate(SunshineDateUtils.normalizeDate(System.currentTimeMillis()));
 
         Cursor cursor = context.getContentResolver().query(weatherUri, WEATHER_NOTIFICATION_PROJECTION, null, null, null);
         if (cursor == null) {
@@ -216,6 +216,7 @@ public class NotificationUtils {
         DataMap weatherDataMap = weatherMapRequest.getDataMap();
         weatherDataMap.putString(HIGH_TEMPERATURE, SunshineWeatherUtils.formatTemperature(context, cursor.getDouble(INDEX_MAX_TEMP)));
         weatherDataMap.putString(LOW_TEMPERATURE, SunshineWeatherUtils.formatTemperature(context, cursor.getDouble(INDEX_MIN_TEMP)));
+        Toast.makeText(context, HIGH_TEMPERATURE, Toast.LENGTH_SHORT).show();
         weatherDataMap.putInt(WEATHER_CONDITION, cursor.getInt(INDEX_WEATHER_ID));
         PutDataRequest weatherRequest = weatherMapRequest.asPutDataRequest();
         Wearable.DataApi.putDataItem(googleApiClient, weatherRequest);
